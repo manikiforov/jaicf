@@ -9,9 +9,8 @@ version = "1.0.0"
 
 val jaicf = "1.2.2"
 val logback = "1.2.3"
-val ktor = "1.5.1"
 
-// Main class to run application on JAICP Cloud. Either JaicpPollerKt, or JaicpServerKt. Will propagate to .jar main class.
+// Main class to run application on heroku. Either JaicpPollerKt, or JaicpServerKt. Will propagate to .jar main class.
 application {
     mainClassName = "com.justai.jaicf.template.connections.JaicpServerKt"
 }
@@ -29,7 +28,6 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback")
 
     implementation("com.just-ai.jaicf:core:$jaicf")
-    implementation("com.just-ai.jaicf:mongo:$jaicf")
     implementation("com.just-ai.jaicf:jaicp:$jaicf")
     implementation("com.just-ai.jaicf:caila:$jaicf")
 }
@@ -41,4 +39,15 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+    shadowJar {
+        archiveFileName.set("app.jar")
+    }
+}
+
+tasks.create("stage") {
+    dependsOn("shadowJar")
+}
+
+tasks.withType<com.justai.jaicf.plugins.jaicp.build.JaicpBuild> {
+    mainClassName.set(application.mainClassName)
 }
